@@ -1,0 +1,40 @@
+.root {
+  width: 100vw;
+  margin-top: 1em;
+  display: flex;
+  justify-content: space-between;
+}
+.tableDiv {
+  width: 90%;
+  margin-left: 1em;
+}
+/*table*/
+tr:nth-child(2n) {
+  background-color: #f8f9fa;
+}
+th.mat-header-cell, td.mat-cell {
+  text-align:  left!important;
+}
+th {
+  align-items: flex-end;
+  text-align: center;
+  background-color: #e9ecef;
+  font-weight: bold;
+  font-size: 13px;
+}
+tr:hover {
+  background-color: #E1E2E3;
+}
+td > span {
+  display: block;
+  padding-bottom: 3px;
+}
+td > span:first-child {
+  padding-top: 3px;
+}
+td > span:last-child {
+  padding-bottom: 0;
+}
+.table {
+  width: 100%;
+}

@@ -1,0 +1,25 @@
+.card {
+  margin: 0.5em;
+  width: 17em;
+  height: 16em;
+}
+.cardDiv {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: space-around;
+}
+.firstSpan {
+  width: 8em;
+  display: inline-block;
+  margin-bottom: 0.15em;
+}
+/*table*/
+.example-container {
+  position: absolute;
+  top: 60px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #eee;
+}
+
