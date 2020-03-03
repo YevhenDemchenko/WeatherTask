@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {CityModel} from './share/models/city.model';
+import {CityModel} from './share/models/City.model';
 import {HttpService} from './share/http.service';
 
 @Component({
@@ -10,10 +10,9 @@ import {HttpService} from './share/http.service';
 export class AppComponent implements OnInit, OnDestroy {
   constructor(private httpService: HttpService) { }
 
-  title = 'testDemchenko';
+  title = 'weatherTask';
   city: CityModel;
   key = 325825;
-
 
   ngOnInit() {
     if (localStorage.getItem('cities') === null) {

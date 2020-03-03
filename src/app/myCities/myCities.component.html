@@ -1,66 +1,59 @@
-<div style="margin-left: 1em; margin-top: 1em; display: flex" *ngIf="isLoad">
-  <div>
+<mat-sidenav-container class="rootMyCities" *ngIf="isLoad">
+  <mat-sidenav mode="side" opened class="sidenav">
     <mat-list>
-      <h3 mat-subheader>Мои города</h3>
+      <h3 mat-subheader style="justify-content: center;">My cities</h3>
       <div *ngIf="myCitiesArray.length !== undefined">
-        <mat-list-item *ngFor="let city of myCitiesArray" style="display: flex">
-          <button mat-button style="margin-left: 1em;" (click)="navigateToWeatherPage(city)">{{city.EnglishName}}</button>
-          <button mat-button *ngIf="myCitiesArray.length !== 1" (click)="deleteCity(city)"><mat-icon>clear</mat-icon></button>
+        <mat-list-item *ngFor="let city of myCitiesArray" class="displayFlex">
+          <span style="width: 10em;">
+            <button mat-button style="margin-left: 1em;" (click)="navigateToWeatherPage(city)">{{city.EnglishName}}</button>
+          </span>
+          <span>
+            <button mat-button *ngIf="myCitiesArray.length !== 1" (click)="deleteCity(city)"><mat-icon>clear</mat-icon></button>
+          </span>
         </mat-list-item>
       </div>
       <div *ngIf="myCitiesArray.length === undefined">
-        <mat-list-item style="display: flex">
-          <h4 mat-line>{{city.EnglishName}}</h4>
-          <button mat-button (click)="deleteCity(city)"><mat-icon>clear</mat-icon></button>
+        <mat-list-item class="displayFlex">
+          <h4 mat-line>{{city[0].EnglishName}}</h4>
+          <button mat-button (click)="deleteCity(city[0])"><mat-icon>clear</mat-icon></button>
         </mat-list-item>
       </div>
     </mat-list>
-  </div>
-  <div style="margin-left: 2em;">
-    <form class="example-form">
-      <mat-form-field class="example-full-width">
-        <input matInput #input
-               placeholder="State"
-               aria-label="State"
-               [formControl]="stateCtrl" (keyup)="searchLocation(input.value)">
-      </mat-form-field>
-      <br>
-    </form><br>
-    <table mat-table [dataSource]="dataSource" class="table" style="width: 50em;" *ngIf="isSearchCompleted">
-      <ng-container matColumnDef="local">
-        <th mat-header-cell *matHeaderCellDef>LocalizedName</th>
-        <td mat-cell *matCellDef="let element"> {{element.LocalizedName}} </td>
-      </ng-container>
+  </mat-sidenav>
+  <mat-sidenav-content class="displayFlex">
+    <div class="mainDiv">
+      <form>
+        <mat-form-field appearance="outline">
+          <mat-label>Enter your city</mat-label>
+          <input matInput #input (keyup)="searchLocation(input.value)">
+        </mat-form-field>
+        <br>
+      </form><br>
+      <table mat-table [dataSource]="dataSource" class="table" style="width: 50em;" *ngIf="isSearchCompleted">
+        <ng-container matColumnDef="LocalizedName">
+          <th mat-header-cell *matHeaderCellDef>LocalizedName</th>
+          <td mat-cell *matCellDef="let element"> {{element.LocalizedName}} </td>
+        </ng-container>
 
-      <ng-container matColumnDef="country">
-        <th mat-header-cell *matHeaderCellDef>Country</th>
-        <td mat-cell *matCellDef="let element"> {{element.Country.LocalizedName}} </td>
-      </ng-container>
+        <ng-container matColumnDef="Country">
+          <th mat-header-cell *matHeaderCellDef>Country</th>
+          <td mat-cell *matCellDef="let element"> {{element.Country.LocalizedName}} </td>
+        </ng-container>
 
-      <ng-container matColumnDef="region">
-        <th mat-header-cell *matHeaderCellDef>AdministrativeArea</th>
-        <td mat-cell *matCellDef="let element"> {{element.AdministrativeArea.LocalizedName}} </td>
-      </ng-container>
+        <ng-container matColumnDef="AdministrativeArea">
+          <th mat-header-cell *matHeaderCellDef>AdministrativeArea</th>
+          <td mat-cell *matCellDef="let element"> {{element.AdministrativeArea.LocalizedName}} </td>
+        </ng-container>
 
-      <ng-container matColumnDef="button">
-        <th mat-header-cell *matHeaderCellDef>Add</th>
-        <td mat-cell *matCellDef="let element"><button mat-button (click)="addCity(element)"><mat-icon>add</mat-icon></button> </td>
-      </ng-container>
+        <ng-container matColumnDef="button">
+          <th mat-header-cell *matHeaderCellDef>Add</th>
+          <td mat-cell *matCellDef="let element"><button mat-button (click)="addCity(element)">
+            <mat-icon>add</mat-icon></button> </td>
+        </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
-    <!--<mat-list *ngIf="isSearchCompleted">
-      <h3 mat-subheader>Результаты поиска:</h3>
-        <mat-list-item *ngFor="let city of allCities">
-          <span style="margin-right: 1em;">{{city.LocalizedName}}</span> <br>
-          <span style="margin-right: 1em;">{{city.Country.LocalizedName}}</span>
-          <button mat-button (click)="addCity(city)"><mat-icon>add</mat-icon></button>
-        </mat-list-item>
-    </mat-list>-->
-  </div>
-
-
-
-</div>
-
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

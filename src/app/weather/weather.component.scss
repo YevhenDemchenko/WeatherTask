@@ -1,20 +1,4 @@
-.card {
-  margin: 0.5em;
-  width: 17em;
-  height: 16em;
-}
-.cardDiv {
-  display: flex;
-  flex-wrap: wrap;
-  align-content: space-around;
-}
-.firstSpan {
-  width: 8em;
-  display: inline-block;
-  margin-bottom: 0.15em;
-}
-/*table*/
-.example-container {
+.rootWeather {
   position: absolute;
   top: 60px;
   bottom: 0;
@@ -22,4 +6,67 @@
   right: 0;
   background: #eee;
 }
-
+.sidenav {
+  width: 13em;
+  justify-content: center;
+  overflow-y: auto;
+}
+.marginLeft {
+  margin-left: 1em;
+}
+.selectedCity {
+  width: 100%;
+  justify-content: center;
+}
+.divWrap {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.spanText {
+  width: 8em;
+  display: inline-block;
+  margin-bottom: 0.15em;
+}
+.margin0_5 {
+  margin: 0.5em;
+}
+.image {
+  width: 75px;
+  height: 45px;
+}
+.divTemperature {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+.card {
+  width: 15em;
+  height: 12em;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1em;
+}
+.card:last-child {
+  margin-bottom: 1em;
+}
+.cardHour {
+  margin-top: 1em;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50em;
+  height: 19em;
+  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: baseline;
+}
+.cardDiv {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: baseline;
+}
+.width50 {
+  width: 50%;
+}

@@ -15,6 +15,7 @@ export class HttpService {
   URL_LOCATION_KEY = 'http://dataservice.accuweather.com/locations/v1/';
   URL_CURRENT_CONDITIONS = 'http://dataservice.accuweather.com/currentconditions/v1/';
   URL_FORECAST = 'http://dataservice.accuweather.com/forecasts/v1/daily/5day/';
+  URL_HOURLY_FORECAST = 'http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/';
 
 
   searchLocation(city) {
@@ -35,5 +36,9 @@ export class HttpService {
 
   getForecast(key) {
     return this.http.get(this.URL_FORECAST + key + '?apikey=' + this.apiKey);
+  }
+
+  getHourlyForecast(key) {
+    return this.http.get(this.URL_HOURLY_FORECAST + key + '?apikey=' + this.apiKey);
   }
 }

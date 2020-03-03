@@ -1,12 +1,22 @@
-.root {
-  width: 100vw;
-  margin-top: 1em;
-  display: flex;
-  justify-content: space-between;
+.rootMyCities {
+  position: absolute;
+  top: 60px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #eee;
 }
-.tableDiv {
-  width: 90%;
+.sidenav {
+  width: 16em;
+  justify-content: center;
+  overflow-y: auto;
+}
+.mainDiv {
   margin-left: 1em;
+  margin-top: 1em;
+}
+.displayFlex {
+  display: flex;
 }
 /*table*/
 tr:nth-child(2n) {

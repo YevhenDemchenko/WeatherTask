@@ -5,6 +5,7 @@ export class DailyForecastsModel {
   Night: DayModel;
   WeatherIcon: number;
   IsDayTime: boolean;
+  DailyForecasts: any;
 }
 export class TemperatureModel {
   Minimum: MinMaxModel;

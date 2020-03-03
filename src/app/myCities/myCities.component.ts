@@ -1,14 +1,11 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {MatPaginator, MatTableDataSource} from '@angular/material';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {MatTableDataSource} from '@angular/material';
 import {HttpService} from '../share/http.service';
-import {CityModel} from '../share/models/city.model';
-import {CurrentConditionsModel} from '../share/models/currentConditions.model';
+import {CityModel} from '../share/models/City.model';
 import {Router} from '@angular/router';
-import {Observable, Subscription} from 'rxjs';
-import {DailyForecastsModel} from '../share/models/DailyForecasts.model';
-import {FormControl} from '@angular/forms';
-import {map, startWith} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 import {TransferService} from '../share/transfer.service';
+import {Subscription} from 'rxjs';
 
 @Component({
   // tslint:disable-next-line:component-selector
@@ -16,49 +13,38 @@ import {TransferService} from '../share/transfer.service';
   templateUrl: './myCities.component.html',
   styleUrls: ['./myCities.component.scss']
 })
-export class MyCitiesComponent implements OnInit {
+export class MyCitiesComponent implements OnInit, OnDestroy {
 
   constructor(private httpService: HttpService, private router: Router, private transferService: TransferService) {
   }
   myCitiesArray: Array<CityModel>;
-
   citiesArr = new Array<CityModel>();
 
-  stateCtrl = new FormControl();
-  allCities: Array<CityModel>;
+  searchLocationAutoSubscription: Subscription = new Subscription();
 
   dataSource = new MatTableDataSource();
-  displayedColumns: string[] = ['local', 'country', 'region', 'button'];
-
-  arr: Array<CityModel>;
-
+  displayedColumns: string[] = ['LocalizedName', 'Country', 'AdministrativeArea', 'button'];
 
   selectedCity: CityModel;
+  city: CityModel[];
+
   isLoad: boolean;
   isSearchCompleted: boolean;
-  city: CityModel;
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
   ngOnInit() {
     this.myCitiesArray = JSON.parse(localStorage.getItem('cities'));
-    if (this.myCitiesArray.length !== undefined) {
-      this.city = this.myCitiesArray[0];
-    } else {
-      // @ts-ignore
-      this.city = this.myCitiesArray;
-    }
+
+    this.city = this.myCitiesArray;
+
     this.selectedCity = null;
     this.isLoad = true;
     this.isSearchCompleted = false;
-
   }
 
   private searchLocation(city) {
-    this.httpService.searchLocationAuto(city).subscribe((data: CityModel[]) => {
-      this.allCities = data;
-      this.dataSource.data = this.allCities;
+    this.searchLocationAutoSubscription = this.httpService.searchLocationAuto(city).subscribe((data: CityModel[]) => {
+      this.dataSource.data = data;
       this.isSearchCompleted = true;
-      console.log(this.allCities);
     });
   }
 
@@ -69,7 +55,6 @@ export class MyCitiesComponent implements OnInit {
 
   private async loadLocationKey(key) {
     this.selectedCity = await this.httpService.searchLocationKey(key).pipe(map((data: CityModel) => data)).toPromise();
-    console.log(this.selectedCity);
   }
 
   private async addCity(city) {
@@ -83,16 +68,19 @@ export class MyCitiesComponent implements OnInit {
 
     if (!isFind) {
       this.citiesArr = new Array<CityModel>();
+
       if (this.myCitiesArray.length !== undefined) {
         this.citiesArr = this.myCitiesArray;
       } else {
         // @ts-ignore
         this.citiesArr.push(this.myCitiesArray);
       }
+
       await this.loadLocationKey(city.Key);
+
       this.citiesArr.push(this.selectedCity);
       this.myCitiesArray = this.citiesArr;
-      console.log(this.citiesArr);
+
       localStorage.setItem('cities', JSON.stringify(this.citiesArr));
     }
   }
@@ -105,5 +93,9 @@ export class MyCitiesComponent implements OnInit {
         return;
       }
     });
+  }
+
+  ngOnDestroy() {
+    this.searchLocationAutoSubscription.unsubscribe();
   }
 }
