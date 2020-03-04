@@ -1,6 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {CityModel} from './share/models/City.model';
 import {HttpService} from './share/http.service';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -14,12 +15,10 @@ export class AppComponent implements OnInit, OnDestroy {
   city: CityModel;
   key = 325825;
 
-  ngOnInit() {
+  async ngOnInit() {
     if (localStorage.getItem('cities') === null) {
-      this.httpService.searchLocationKey(this.key).subscribe((data: CityModel) => {
-        this.city = data;
-        localStorage.setItem('cities', JSON.stringify(this.city));
-      });
+      this.city = await this.httpService.searchLocationKey(this.key).pipe(map((data: CityModel) => data)).toPromise();
+      localStorage.setItem('cities', JSON.stringify(this.city));
     }
   }
 

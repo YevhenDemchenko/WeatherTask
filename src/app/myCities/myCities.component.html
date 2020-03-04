@@ -8,14 +8,14 @@
             <button mat-button style="margin-left: 1em;" (click)="navigateToWeatherPage(city)">{{city.EnglishName}}</button>
           </span>
           <span>
-            <button mat-button *ngIf="myCitiesArray.length !== 1" (click)="deleteCity(city)"><mat-icon>clear</mat-icon></button>
+            <button mat-button *ngIf="myCitiesArray.length !== 1"
+                    (click)="deleteCity(city)"><mat-icon>clear</mat-icon></button>
           </span>
         </mat-list-item>
       </div>
       <div *ngIf="myCitiesArray.length === undefined">
         <mat-list-item class="displayFlex">
-          <h4 mat-line>{{city[0].EnglishName}}</h4>
-          <button mat-button (click)="deleteCity(city[0])"><mat-icon>clear</mat-icon></button>
+          <button mat-button style="margin-left: 1em;" (click)="navigateToWeatherPage(city)">{{city.EnglishName}}</button>
         </mat-list-item>
       </div>
     </mat-list>

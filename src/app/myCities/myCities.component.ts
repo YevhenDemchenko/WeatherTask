@@ -27,16 +27,21 @@ export class MyCitiesComponent implements OnInit, OnDestroy {
 
   selectedCity: CityModel;
   city: CityModel[];
+  key = '325825';
 
   isLoad: boolean;
   isSearchCompleted: boolean;
 
-  ngOnInit() {
+  async ngOnInit() {
     this.myCitiesArray = JSON.parse(localStorage.getItem('cities'));
 
     this.city = this.myCitiesArray;
 
     this.selectedCity = null;
+    if (this.myCitiesArray === null) {
+      this.myCitiesArray = await this.httpService.searchLocationKey(this.key).pipe(map((data: CityModel[]) => data)).toPromise();
+      this.city = this.myCitiesArray;
+    }
     this.isLoad = true;
     this.isSearchCompleted = false;
   }
@@ -60,9 +65,11 @@ export class MyCitiesComponent implements OnInit, OnDestroy {
   private async addCity(city) {
     let isFind = false;
 
-    for (const c of this.myCitiesArray) {
-      if (c.Key === city.Key) {
-        isFind = true;
+    if (this.myCitiesArray.length === null) {
+      for (const c of this.myCitiesArray) {
+        if (c.Key === city.Key) {
+          isFind = true;
+        }
       }
     }
 

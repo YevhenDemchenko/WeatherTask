@@ -9,7 +9,7 @@
       </div>
       <div *ngIf="myCitiesArray.length === undefined">
         <mat-list-item>
-          <button mat-button class="marginLeft" (click)="loadLocationForecast(city[0].Key)">{{city[0].EnglishName}}</button>
+          <button mat-button class="marginLeft" (click)="loadLocationForecast(city.Key)">{{city.EnglishName}}</button>
         </mat-list-item>
       </div>
     </mat-list>
@@ -18,7 +18,8 @@
     <div>
       <mat-card class="cardHour">
         <mat-card-content>
-          <span class="selectedCity">{{city[0].EnglishName}}</span>
+          <span class="selectedCity" *ngIf="city.length !== undefined">{{city[0].EnglishName}}</span>
+          <span class="selectedCity" *ngIf="city.length === undefined">{{city.EnglishName}}</span>
           <div class="divWrap" >
             <div style="margin: 0.5em;" *ngFor="let day of forecastHourArr">
               <span class="spanText timeText">{{day.DateTime | date: 'HH.mm': 'Europe/Kiev'}} </span><br><br>
