@@ -15,6 +15,8 @@
   margin-left: 1em;
 }
 .selectedCity {
+  font-weight: bold;
+  font-size: 18px;
   width: 100%;
   justify-content: center;
 }
@@ -22,6 +24,10 @@
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
+}
+.timeText {
+  font-size: 14px!important;
+  font-weight: bold;
 }
 .spanText {
   width: 8em;
@@ -55,8 +61,8 @@
   margin-top: 1em;
   margin-left: auto;
   margin-right: auto;
-  width: 50em;
-  height: 19em;
+  width: 57em;
+  height: 20em;
   text-align: center;
   display: flex;
   flex-wrap: wrap;

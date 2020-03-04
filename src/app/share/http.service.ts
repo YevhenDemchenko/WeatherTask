@@ -9,7 +9,7 @@ export class HttpService {
 
   constructor(private http: HttpClient) { }
 
-  private apiKey = '6RGW2B1fAkVuOCmRD3epsgZqU7OYFtd4';
+  private apiKey = '31qduQeXC8GmsOfN7sxh71pUjEaa1Vke';
   URL_LOCATION = 'http://dataservice.accuweather.com/locations/v1/cities/search?apikey=' + this.apiKey + '&q=';
   URL_LOCATION_AUTO = 'http://dataservice.accuweather.com/locations/v1/cities/autocomplete?apikey=' + this.apiKey + '&q=';
   URL_LOCATION_KEY = 'http://dataservice.accuweather.com/locations/v1/';

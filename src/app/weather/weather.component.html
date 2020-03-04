@@ -21,7 +21,7 @@
           <span class="selectedCity">{{city[0].EnglishName}}</span>
           <div class="divWrap" >
             <div style="margin: 0.5em;" *ngFor="let day of forecastHourArr">
-              <span class="spanText">{{day.DateTime | date: 'HH.mm': 'Europe/Kiev'}} </span><br><br>
+              <span class="spanText timeText">{{day.DateTime | date: 'HH.mm': 'Europe/Kiev'}} </span><br><br>
               <img mat-card-image *ngIf="day.WeatherIcon.toString().length !== 1" class="image"
                    src="https://developer.accuweather.com/sites/default/files/{{day.WeatherIcon}}-s.png">
               <img mat-card-image *ngIf="day.WeatherIcon.toString().length === 1" class="image"
@@ -35,7 +35,7 @@
       <div class="cardDiv">
         <mat-card class="card" *ngFor="let day of forecastArr">
           <mat-card-header style="display: block; justify-content: center">
-            {{day.Date  | date: 'dd.MM.yyyy': 'Europe/Kiev'}}<br>
+            <span style="font-weight: bold">{{day.Date  | date: 'dd.MM.yyyy': 'Europe/Kiev'}}</span><br>
           </mat-card-header>
           <mat-card-content style="height: 10em;">
             <div style="display: flex; justify-content: center;">
