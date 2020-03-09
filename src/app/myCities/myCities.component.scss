@@ -48,3 +48,17 @@ td > span:last-child {
 .table {
   width: 100%;
 }
+.spinner {
+  position: absolute;
+  top: calc(50% - 50px);
+  left: calc(50% - 50px);
+  margin-right: -50%;
+  transform: translate(-50%, -50%)
+}
+.error {
+  position: absolute;
+  top: 65%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%)
+}

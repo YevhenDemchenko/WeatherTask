@@ -1,7 +1,23 @@
 <mat-toolbar color="primary" style="height: 60px;">
-  <mat-toolbar-row>
-    <a routerLink="weather" routerLinkActive="active" class="link">Weather</a>
-    <a routerLink="myCities" routerLinkActive="active" class="link">My cities</a>
+  <mat-toolbar-row style="display: flex; justify-content: space-between">
+    <div [ngSwitch]="this.language">
+      <a *ngSwitchCase="'ru'" routerLink="weather" routerLinkActive="active" class="link">Погода</a>
+      <a *ngSwitchCase="'ru'" routerLink="myCities" routerLinkActive="active" class="link">Мои города</a>
+      <a *ngSwitchCase="'en'" routerLink="weather" routerLinkActive="active" class="link">Weather</a>
+      <a *ngSwitchCase="'en'" routerLink="myCities" routerLinkActive="active" class="link">My cities</a>
+    </div>
+    <mat-form-field style="font-size: 10px;">
+      <div [ngSwitch]="this.language">
+        <mat-label *ngSwitchCase="'ru'">Выберите язык</mat-label>
+        <mat-label *ngSwitchCase="'en'">Choose language</mat-label>
+      </div>
+      <mat-select [(value)]="this.language" (selectionChange)="changeLanguage()" [ngSwitch]="this.language">
+        <mat-option *ngSwitchCase="'ru'" value="ru">Русский</mat-option>
+        <mat-option *ngSwitchCase="'ru'" value="en">Английский</mat-option>
+        <mat-option *ngSwitchCase="'en'" value="ru">Russian</mat-option>
+        <mat-option *ngSwitchCase="'en'" value="en">English</mat-option>
+      </mat-select>
+    </mat-form-field>
   </mat-toolbar-row>
 </mat-toolbar>
 <router-outlet></router-outlet>

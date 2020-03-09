@@ -1,19 +1,15 @@
 export class CityModel {
+  constructor(Key: string, LocalizedName: string, Country: CountryModel) {
+    this.Key = Key;
+    this.LocalizedName = LocalizedName;
+    this.Country = Country;
+  }
+
   Key: string;
-  Type: string;
-  Rank: number;
   LocalizedName: string;
-  EnglishName: string;
-  Region: RegionModel;
   Country: CountryModel;
 }
-export class RegionModel {
-  ID: string;
+
+interface CountryModel {
   LocalizedName: string;
-  EnglishName: string;
-}
-export class CountryModel {
-  ID: string;
-  LocalizedName: string;
-  EnglishName: string;
 }

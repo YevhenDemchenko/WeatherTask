@@ -1,11 +1,14 @@
-export class DailyForecastsModel {
+export class ForecastDay {
+  constructor(Date: string, Temperature: TemperatureModel, Day: DayModel, Night: DayModel) {
+    this.Date = Date;
+    this.Temperature = Temperature;
+    this.Day = Day;
+    this.Night = Night;
+  }
   Date: string;
   Temperature: TemperatureModel;
   Day: DayModel;
   Night: DayModel;
-  WeatherIcon: number;
-  IsDayTime: boolean;
-  DailyForecasts: any;
 }
 export class TemperatureModel {
   Minimum: MinMaxModel;
@@ -14,10 +17,12 @@ export class TemperatureModel {
 class MinMaxModel {
   Value: number;
   Unit: string;
-  UnitType: number;
 }
 class DayModel {
   Icon: number;
   IconPhrase: string;
-  HasPrecipitation: boolean;
+}
+export class DailyForecastsModel {
+  Headline: any;
+  DailyForecasts: ForecastDay[];
 }

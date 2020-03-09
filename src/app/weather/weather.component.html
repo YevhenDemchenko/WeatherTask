@@ -1,34 +1,35 @@
 <mat-sidenav-container class="rootWeather" *ngIf="isLoad">
   <mat-sidenav mode="side" opened class="sidenav">
     <mat-list>
-      <h3 mat-subheader style="justify-content: center;">My cities</h3>
-      <div *ngIf="myCitiesArray.length !== undefined">
-        <mat-list-item *ngFor="let city of myCitiesArray">
-          <button mat-button class="marginLeft" (click)="loadLocationForecast(city.Key)">{{city.EnglishName}}</button>
-        </mat-list-item>
+      <div [ngSwitch]="language">
+        <h3 *ngSwitchCase="'ru'" mat-subheader style="justify-content: center;">Мои города</h3>
+        <h3 *ngSwitchCase="'en'" mat-subheader style="justify-content: center;">My cities</h3>
       </div>
-      <div *ngIf="myCitiesArray.length === undefined">
-        <mat-list-item>
-          <button mat-button class="marginLeft" (click)="loadLocationForecast(city.Key)">{{city.EnglishName}}</button>
+      <div>
+        <mat-list-item *ngFor="let cit of myCitiesArray">
+          <button mat-button class="marginLeft" (click)="loadLocationForecast(cit.Key)">{{cit.LocalizedName}}</button>
         </mat-list-item>
       </div>
     </mat-list>
   </mat-sidenav>
-  <mat-sidenav-content style="display: flex" *ngIf="isWeatherDownload">
+  <mat-sidenav-content style="display: flex">
     <div>
       <mat-card class="cardHour">
         <mat-card-content>
-          <span class="selectedCity" *ngIf="city.length !== undefined">{{city[0].EnglishName}}</span>
-          <span class="selectedCity" *ngIf="city.length === undefined">{{city.EnglishName}}</span>
+          <span class="selectedCity">{{city.LocalizedName}}</span>
           <div class="divWrap" >
-            <div style="margin: 0.5em;" *ngFor="let day of forecastHourArr">
-              <span class="spanText timeText">{{day.DateTime | date: 'HH.mm': 'Europe/Kiev'}} </span><br><br>
-              <img mat-card-image *ngIf="day.WeatherIcon.toString().length !== 1" class="image"
-                   src="https://developer.accuweather.com/sites/default/files/{{day.WeatherIcon}}-s.png">
-              <img mat-card-image *ngIf="day.WeatherIcon.toString().length === 1" class="image"
-                   src="https://developer.accuweather.com/sites/default/files/0{{day.WeatherIcon}}-s.png"><br>
-              <span>{{day.IconPhrase}}</span><br>
-              <span>{{day.Temperature.Value}} F</span><br>
+            <div style="width: 8em!important; margin: 1em 0.5em 0.5em;" *ngFor="let day of forecastHourArr">
+              <div style="height: 9em">
+                <span class="spanText timeText">{{day.DateTime | date: 'HH.mm'}} </span><br><br>
+                <div [ngSwitch]="day.WeatherIcon.toString().length">
+                  <img mat-card-image *ngSwitchCase="2" class="image"
+                       src="https://developer.accuweather.com/sites/default/files/{{day.WeatherIcon}}-s.png">
+                  <img mat-card-image *ngSwitchCase="1" class="image"
+                       src="https://developer.accuweather.com/sites/default/files/0{{day.WeatherIcon}}-s.png"><br>
+                </div>
+                <span style="font-size: 13px; max-width: 2em;">{{day.IconPhrase}}</span><br>
+              </div>
+              <span style="font-size: 13px">{{day.Temperature.Value}} {{day.Temperature.Unit}}</span><br>
             </div>
           </div><br>
         </mat-card-content>
@@ -38,32 +39,54 @@
           <mat-card-header style="display: block; justify-content: center">
             <span style="font-weight: bold">{{day.Date  | date: 'dd.MM.yyyy': 'Europe/Kiev'}}</span><br>
           </mat-card-header>
-          <mat-card-content style="height: 10em;">
+          <mat-card-content style="height: 12em;">
             <div style="display: flex; justify-content: center;">
               <div class="margin0_5">
-                <span class="spanText">Day: </span><br><br>
-                <img mat-card-image *ngIf="day.Day.Icon.toString().length !== 1" class="image"
-                     src="https://developer.accuweather.com/sites/default/files/{{day.Day.Icon}}-s.png">
-                <img mat-card-image *ngIf="day.Day.Icon.toString().length === 1" class="image"
-                     src="https://developer.accuweather.com/sites/default/files/0{{day.Day.Icon}}-s.png"><br>
-                <span>{{day.Day.IconPhrase}}</span><br>
+                <div [ngSwitch]="language">
+                  <span *ngSwitchCase="'ru'" class="spanText">День: </span><br><br>
+                  <span *ngSwitchCase="'en'" class="spanText">Day: </span><br><br>
+                </div>
+                <div [ngSwitch]="day.Day.Icon.toString().length">
+                  <img mat-card-image *ngSwitchCase="2" class="image"
+                       src="https://developer.accuweather.com/sites/default/files/{{day.Day.Icon}}-s.png">
+                  <img mat-card-image *ngSwitchCase="1" class="image"
+                       src="https://developer.accuweather.com/sites/default/files/0{{day.Day.Icon}}-s.png"><br>
+                </div>
+                <span style="font-size: 13px">{{day.Day.IconPhrase}}</span><br>
               </div>
               <div class="margin0_5">
-                <span class="spanText">Night: </span><br><br>
-                <img mat-card-image *ngIf="day.Night.Icon.toString().length !== 1" class="image"
-                     src="https://developer.accuweather.com/sites/default/files/{{day.Night.Icon}}-s.png">
-                <img mat-card-image *ngIf="day.Night.Icon.toString().length === 1" class="image"
-                     src="https://developer.accuweather.com/sites/default/files/0{{day.Night.Icon}}-s.png"><br>
-                <span>{{day.Night.IconPhrase}}</span><br>
+                <div [ngSwitch]="language">
+                  <span *ngSwitchCase="'ru'" class="spanText">Ночь: </span><br><br>
+                  <span *ngSwitchCase="'en'" class="spanText">Night: </span><br><br>
+                </div>
+                <div [ngSwitch]="day.Night.Icon.toString().length">
+                  <img mat-card-image *ngSwitchCase="2" class="image"
+                       src="https://developer.accuweather.com/sites/default/files/{{day.Night.Icon}}-s.png">
+                  <img mat-card-image *ngSwitchCase="1" class="image"
+                       src="https://developer.accuweather.com/sites/default/files/0{{day.Night.Icon}}-s.png"><br>
+                </div>
+                <span style="font-size: 13px">{{day.Night.IconPhrase}}</span><br>
               </div>
             </div><br>
           </mat-card-content>
-          <div class="divTemperature">
-            <span class="width50">min: {{day.Temperature.Minimum.Value}} F</span>
-            <span class="width50">max: {{day.Temperature.Maximum.Value}} F</span><br>
+          <div class="divTemperature" [ngSwitch]="language">
+            <span *ngSwitchCase="'ru'" class="width50">мин: {{day.Temperature.Minimum.Value}} {{day.Temperature.Minimum.Unit}}</span>
+            <span *ngSwitchCase="'ru'" class="width50">макс: {{day.Temperature.Maximum.Value}} {{day.Temperature.Maximum.Unit}}</span><br>
+            <span *ngSwitchCase="'en'" class="width50">min: {{day.Temperature.Minimum.Value}} {{day.Temperature.Minimum.Unit}}</span>
+            <span *ngSwitchCase="'en'" class="width50">max: {{day.Temperature.Maximum.Value}} {{day.Temperature.Maximum.Unit}}</span><br>
           </div>
         </mat-card>
       </div>
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>
+<div *ngIf="!isLoad">
+  <mat-progress-spinner class="spinner" style="margin: auto;" color="primary" mode="indeterminate">
+  </mat-progress-spinner>
+  <mat-error *ngIf="isErrorVisible" class="error">
+    <div [ngSwitch]="language">
+      <span *ngSwitchCase="'ru'">Возникла ошибка! Перезагрузите страницу позже или обратитесь к системному администратору.</span>
+      <span *ngSwitchCase="'en'">An error has occurred! Please reload the page later or contact your system administrator.</span>
+    </div>
+  </mat-error>
+</div>

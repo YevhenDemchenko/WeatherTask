@@ -11,7 +11,7 @@ import {
   MatCardModule,
   MatFormFieldModule,
   MatIconModule, MatInputModule, MatListModule,
-  MatPaginatorModule, MatSidenavModule,
+  MatPaginatorModule, MatProgressSpinnerModule, MatSelectModule, MatSidenavModule,
   MatTableModule,
   MatToolbarModule
 } from '@angular/material';
@@ -49,7 +49,9 @@ export const rout: Routes = [
     MatListModule,
     MatSidenavModule,
     MatAutocompleteModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatProgressSpinnerModule,
+    MatSelectModule
   ],
   providers: [],
   bootstrap: [AppComponent]

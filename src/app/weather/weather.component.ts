@@ -1,12 +1,10 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {Subscription} from 'rxjs';
-import {MatPaginator} from '@angular/material';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {concat, Observable, Subscription} from 'rxjs';
 import {HttpService} from '../share/http.service';
 import {CityModel} from '../share/models/City.model';
-import {DailyForecastsModel} from '../share/models/DailyForecasts.model';
+import {DailyForecastsModel, ForecastDay} from '../share/models/DailyForecasts.model';
 import {TransferService} from '../share/transfer.service';
 import {HourlyForecastsModel} from '../share/models/HourlyForecasts.model';
-import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-weather',
@@ -18,65 +16,125 @@ export class WeatherComponent implements OnInit, OnDestroy {
   constructor(private httpService: HttpService, private transferService: TransferService ) { }
 
   isLoad: boolean;
+  isErrorVisible = false;
+
   forecastSubscriptions: Subscription = new Subscription();
   hourlySubscriptions: Subscription = new Subscription();
+  locationByIpSubscriptions: Subscription = new Subscription();
 
-  isWeatherDownload: boolean;
   myCitiesArray: Array<CityModel>;
-
-  forecastArr: Array<DailyForecastsModel>;
+  forecastArr: Array<ForecastDay>;
   forecastHourArr: Array<HourlyForecastsModel>;
 
-  key = '325825';
-  city: CityModel[];
+  city: CityModel;
+  language: string;
 
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  observableForecast: Observable<DailyForecastsModel>;
+  observableHourlyForecast: Observable<HourlyForecastsModel[]>;
+  observableLocationByIp: Observable<CityModel>;
 
-  async ngOnInit() {
+  ngOnInit() {
     this.myCitiesArray = JSON.parse(localStorage.getItem('cities'));
+    this.language = localStorage.getItem('language');
 
-    this.isWeatherDownload = false;
+    if (this.language === null) {
+      this.language = 'ru';
+      localStorage.setItem('language', this.language);
+    }
 
-    if (this.myCitiesArray !== null) {
+    if (!!this.myCitiesArray) {
       if (this.transferService.Key.getValue() !== null) {
         this.loadLocationForecast(this.transferService.Key.getValue());
       } else {
-        this.loadLocationForecast(this.key);
+        this.loadLocationForecast(this.myCitiesArray[0].Key);
       }
     } else {
-      // @ts-ignore
-      this.city = await this.httpService.searchLocationKey(this.key).pipe(map((data: CityModel) => data)).toPromise();
-      this.loadLocationForecast(this.key);
+      this.getLocationByIp();
     }
   }
 
   private loadLocationForecast(key) {
-    if (this.myCitiesArray !== null) {
-      if (this.myCitiesArray.length !== undefined) {
-        this.city = this.myCitiesArray.filter((e) => e.Key.toString() === key.toString());
-      } else {
-        this.city = this.myCitiesArray;
-      }
+    if (!!this.myCitiesArray) {
+      this.city = this.myCitiesArray.filter((e) => e.Key.toString() === key.toString())[0];
     } else {
-      this.myCitiesArray = this.city;
+      this.myCitiesArray = new Array<CityModel>();
+      this.myCitiesArray.push(this.city);
     }
 
-    this.forecastSubscriptions = this.httpService.getForecast(key).subscribe((data: DailyForecastsModel)  => {
-      this.forecastArr = data.DailyForecasts;
-      this.isWeatherDownload = true;
-    });
-    this.isLoad = true;
+    this.forecastHourArr = new Array<HourlyForecastsModel>();
+    this.forecastArr = new Array<ForecastDay>();
+
+    this.getForecast(key);
     this.loadLocationHourlyKey(key);
+
+    this.onLoadingDone();
+  }
+
+  private onLoadingDone() {
+    concat(this.observableForecast, this.observableHourlyForecast).subscribe({
+      complete: () => {
+        this.isLoad = true;
+      },
+      error: error => {
+        this.isLoad = false;
+        this.isErrorVisible = true;
+        console.error('There was an error!', error);
+      }
+    });
+  }
+
+  private getForecast(key) {
+    this.observableForecast = this.httpService.getForecast(key);
+    this.forecastSubscriptions = this.observableForecast.subscribe({
+      next: (data: DailyForecastsModel) => {
+        data.DailyForecasts.forEach((e) => {
+          this.forecastArr.push(new ForecastDay(e.Date, e.Temperature, e.Day, e.Night));
+        });
+      },
+      error: error => {
+        this.isLoad = false;
+        this.isErrorVisible = true;
+        console.error('There was an error!', error);
+      }
+    });
   }
 
   private loadLocationHourlyKey(key) {
-    this.hourlySubscriptions = this.httpService.getHourlyForecast(key).subscribe((data2: HourlyForecastsModel[]) => {
-      this.forecastHourArr = data2;
+    this.observableHourlyForecast = this.httpService.getHourlyForecast(key);
+    this.hourlySubscriptions = this.observableHourlyForecast.subscribe( {
+      next: (data: HourlyForecastsModel[]) => {
+        data.forEach((e) => {
+          this.forecastHourArr.push(new HourlyForecastsModel(e.Key, e.DateTime, e.IconPhrase, e.Temperature, e.WeatherIcon));
+        });
+      },
+      error: error => {
+        this.isLoad = false;
+        this.isErrorVisible = true;
+        console.error('There was an error!', error);
+      }
+    });
+  }
+
+  private getLocationByIp() {
+    this.observableLocationByIp = this.httpService.getLocationByIp();
+    this.locationByIpSubscriptions = this.observableLocationByIp.subscribe({
+      next: (data: CityModel) => {
+        this.city = new CityModel(data.Key, data.LocalizedName, data.Country);
+      },
+      complete: () => {
+        this.loadLocationForecast(this.city.Key);
+      },
+      error: error => {
+        this.isLoad = false;
+        this.isErrorVisible = true;
+        console.error('There was an error!', error);
+      }
     });
   }
 
   ngOnDestroy() {
     this.forecastSubscriptions.unsubscribe();
     this.hourlySubscriptions.unsubscribe();
+    this.locationByIpSubscriptions.unsubscribe();
   }
 }

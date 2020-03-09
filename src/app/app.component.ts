@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {CityModel} from './share/models/City.model';
 import {HttpService} from './share/http.service';
-import {map} from 'rxjs/operators';
+import {Observable, Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -12,16 +12,45 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(private httpService: HttpService) { }
 
   title = 'weatherTask';
-  city: CityModel;
-  key = 325825;
+  citiesArr = new Array<CityModel>();
+  language: string;
 
-  async ngOnInit() {
+  observableLocationByIp: Observable<CityModel>;
+
+  locationByIpSubscriptions: Subscription = new Subscription();
+
+  ngOnInit() {
+    this.language = localStorage.getItem('language');
+
+    if (this.language === null) {
+      this.language = 'ru';
+      localStorage.setItem('language', this.language);
+    }
+
     if (localStorage.getItem('cities') === null) {
-      this.city = await this.httpService.searchLocationKey(this.key).pipe(map((data: CityModel) => data)).toPromise();
-      localStorage.setItem('cities', JSON.stringify(this.city));
+      this.getLocationByIp();
     }
   }
 
+  changeLanguage() {
+    localStorage.setItem('language', this.language);
+    window.location.reload();
+  }
+
+  private getLocationByIp() {
+    this.observableLocationByIp = this.httpService.getLocationByIp();
+    this.locationByIpSubscriptions = this.observableLocationByIp.subscribe({
+      next: (data: CityModel) => {
+        this.citiesArr.push(new CityModel(data.Key, data.LocalizedName, data.Country));
+      },
+      complete: () => {
+        localStorage.setItem('cities', JSON.stringify(this.citiesArr));
+      },
+      error: error => console.error('There was an error!', error)
+    });
+  }
+
   ngOnDestroy() {
+    this.locationByIpSubscriptions.unsubscribe();
   }
 }

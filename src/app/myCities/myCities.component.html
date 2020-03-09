@@ -1,21 +1,19 @@
 <mat-sidenav-container class="rootMyCities" *ngIf="isLoad">
   <mat-sidenav mode="side" opened class="sidenav">
     <mat-list>
-      <h3 mat-subheader style="justify-content: center;">My cities</h3>
-      <div *ngIf="myCitiesArray.length !== undefined">
-        <mat-list-item *ngFor="let city of myCitiesArray" class="displayFlex">
+      <div [ngSwitch]="language">
+        <h3 *ngSwitchCase="'ru'" mat-subheader style="justify-content: center;">Мои города</h3>
+        <h3 *ngSwitchCase="'en'" mat-subheader style="justify-content: center;">My cities</h3>
+      </div>
+      <div>
+        <mat-list-item *ngFor="let cit of myCitiesArray" class="displayFlex">
           <span style="width: 10em;">
-            <button mat-button style="margin-left: 1em;" (click)="navigateToWeatherPage(city)">{{city.EnglishName}}</button>
+            <button mat-button style="margin-left: 1em;" (click)="navigateToWeatherPage(cit)">{{cit.LocalizedName}}</button>
           </span>
           <span>
             <button mat-button *ngIf="myCitiesArray.length !== 1"
-                    (click)="deleteCity(city)"><mat-icon>clear</mat-icon></button>
+                    (click)="deleteCity(cit)"><mat-icon>clear</mat-icon></button>
           </span>
-        </mat-list-item>
-      </div>
-      <div *ngIf="myCitiesArray.length === undefined">
-        <mat-list-item class="displayFlex">
-          <button mat-button style="margin-left: 1em;" (click)="navigateToWeatherPage(city)">{{city.EnglishName}}</button>
         </mat-list-item>
       </div>
     </mat-list>
@@ -23,30 +21,43 @@
   <mat-sidenav-content class="displayFlex">
     <div class="mainDiv">
       <form>
-        <mat-form-field appearance="outline">
-          <mat-label>Enter your city</mat-label>
-          <input matInput #input (keyup)="searchLocation(input.value)">
+        <mat-form-field [ngSwitch]="language" appearance="outline" style="width: 20em;">
+          <mat-label *ngSwitchCase="'ru'">Впишите название города</mat-label>
+          <mat-label *ngSwitchCase="'en'">Enter your city</mat-label>
+          <input matInput #input>
         </mat-form-field>
+        <div [ngSwitch]="language" >
+          <button *ngSwitchCase="'ru'" mat-stroked-button (click)="searchLocation(input.value)">Искать город</button>
+          <button *ngSwitchCase="'en'" mat-stroked-button (click)="searchLocation(input.value)">Search</button>
+        </div>
         <br>
       </form><br>
       <table mat-table [dataSource]="dataSource" class="table" style="width: 50em;" *ngIf="isSearchCompleted">
         <ng-container matColumnDef="LocalizedName">
-          <th mat-header-cell *matHeaderCellDef>LocalizedName</th>
+          <th mat-header-cell [ngSwitch]="language" *matHeaderCellDef>
+            <span *ngSwitchCase="'ru'">Город</span>
+            <span *ngSwitchCase="'en'">City</span></th>
           <td mat-cell *matCellDef="let element"> {{element.LocalizedName}} </td>
         </ng-container>
 
         <ng-container matColumnDef="Country">
-          <th mat-header-cell *matHeaderCellDef>Country</th>
+          <th mat-header-cell *matHeaderCellDef [ngSwitch]="language">
+            <span *ngSwitchCase="'ru'">Страна</span>
+            <span *ngSwitchCase="'en'">Country</span></th>
           <td mat-cell *matCellDef="let element"> {{element.Country.LocalizedName}} </td>
         </ng-container>
 
         <ng-container matColumnDef="AdministrativeArea">
-          <th mat-header-cell *matHeaderCellDef>AdministrativeArea</th>
+          <th mat-header-cell *matHeaderCellDef [ngSwitch]="language">
+            <span *ngSwitchCase="'ru'">Область</span>
+            <span *ngSwitchCase="'en'">Administrative area</span></th>
           <td mat-cell *matCellDef="let element"> {{element.AdministrativeArea.LocalizedName}} </td>
         </ng-container>
 
         <ng-container matColumnDef="button">
-          <th mat-header-cell *matHeaderCellDef>Add</th>
+          <th mat-header-cell *matHeaderCellDef [ngSwitch]="language">
+            <span *ngSwitchCase="'ru'">Добавить город</span>
+            <span *ngSwitchCase="'en'">Add city</span></th>
           <td mat-cell *matCellDef="let element"><button mat-button (click)="addCity(element)">
             <mat-icon>add</mat-icon></button> </td>
         </ng-container>
@@ -57,3 +68,14 @@
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>
+
+<div *ngIf="!isLoad">
+  <mat-progress-spinner class="spinner" color="primary" mode="indeterminate">
+  </mat-progress-spinner>
+  <mat-error *ngIf="isErrorVisible" class="error">
+    <div [ngSwitch]="language">
+      <span *ngSwitchCase="'ru'">Возникла ошибка! Перезагрузите страницу позже или обратитесь к системному администратору.</span>
+      <span *ngSwitchCase="'en'">An error has occurred! Please reload the page later or contact your system administrator.</span>
+    </div>
+  </mat-error>
+</div>

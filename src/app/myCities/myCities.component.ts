@@ -3,13 +3,11 @@ import {MatTableDataSource} from '@angular/material';
 import {HttpService} from '../share/http.service';
 import {CityModel} from '../share/models/City.model';
 import {Router} from '@angular/router';
-import {map} from 'rxjs/operators';
 import {TransferService} from '../share/transfer.service';
-import {Subscription} from 'rxjs';
+import {Observable, Subscription} from 'rxjs';
 
 @Component({
-  // tslint:disable-next-line:component-selector
-  selector: 'app-myCities',
+  selector: 'app-my-cities',
   templateUrl: './myCities.component.html',
   styleUrls: ['./myCities.component.scss']
 })
@@ -17,39 +15,61 @@ export class MyCitiesComponent implements OnInit, OnDestroy {
 
   constructor(private httpService: HttpService, private router: Router, private transferService: TransferService) {
   }
-  myCitiesArray: Array<CityModel>;
-  citiesArr = new Array<CityModel>();
 
   searchLocationAutoSubscription: Subscription = new Subscription();
+  locationByIpSubscriptions: Subscription = new Subscription();
+  locationKeySubscriptions: Subscription = new Subscription();
 
   dataSource = new MatTableDataSource();
   displayedColumns: string[] = ['LocalizedName', 'Country', 'AdministrativeArea', 'button'];
 
+  myCitiesArray: Array<CityModel>;
   selectedCity: CityModel;
-  city: CityModel[];
-  key = '325825';
+  city: CityModel;
 
-  isLoad: boolean;
-  isSearchCompleted: boolean;
+  isLoad = false;
+  isSearchCompleted = false;
+  isErrorVisible = false;
+  language: string;
 
-  async ngOnInit() {
+  observableLocation: Observable<CityModel[]>;
+  observableLocationByKey: Observable<CityModel>;
+  observableLocationByIp: Observable<CityModel>;
+
+  ngOnInit() {
     this.myCitiesArray = JSON.parse(localStorage.getItem('cities'));
+    this.language = localStorage.getItem('language');
 
-    this.city = this.myCitiesArray;
+    if (this.language === null) {
+      this.language = 'ru';
+      localStorage.setItem('language', this.language);
+    }
 
     this.selectedCity = null;
-    if (this.myCitiesArray === null) {
-      this.myCitiesArray = await this.httpService.searchLocationKey(this.key).pipe(map((data: CityModel[]) => data)).toPromise();
-      this.city = this.myCitiesArray;
+
+    if (!!this.myCitiesArray) {
+      this.city = this.myCitiesArray[0];
+      this.isLoad = true;
+    } else {
+      this.myCitiesArray = new Array<CityModel>();
+      this.getLocationByIp();
     }
-    this.isLoad = true;
-    this.isSearchCompleted = false;
   }
 
   private searchLocation(city) {
-    this.searchLocationAutoSubscription = this.httpService.searchLocationAuto(city).subscribe((data: CityModel[]) => {
-      this.dataSource.data = data;
-      this.isSearchCompleted = true;
+    this.observableLocation = this.httpService.getLocation(city);
+    this.searchLocationAutoSubscription = this.observableLocation.subscribe({
+      next: (data: CityModel[]) => {
+        this.dataSource.data = data;
+      },
+      complete: () => {
+        this.isSearchCompleted = true;
+      },
+      error: error => {
+        this.isLoad = false;
+        this.isErrorVisible = true;
+        console.error('There was an error!', error);
+      }
     });
   }
 
@@ -58,51 +78,62 @@ export class MyCitiesComponent implements OnInit, OnDestroy {
     this.router.navigate(['weather']);
   }
 
-  private async loadLocationKey(key) {
-    this.selectedCity = await this.httpService.searchLocationKey(key).pipe(map((data: CityModel) => data)).toPromise();
+  private addLocationByKeyToStorage(key) {
+    this.observableLocationByKey = this.httpService.getLocationByKey(key);
+    this.locationKeySubscriptions = this.observableLocationByKey.subscribe({
+      next: (data: CityModel) => {
+        this.selectedCity = new CityModel(data.Key, data.LocalizedName, data.Country);
+      },
+      complete: () => {
+        this.myCitiesArray.push(this.selectedCity);
+        localStorage.setItem('cities', JSON.stringify(this.myCitiesArray));
+      },
+      error: error => {
+        this.isLoad = false;
+        this.isErrorVisible = true;
+        console.error('There was an error!', error);
+      }
+    });
   }
 
   private async addCity(city) {
     let isFind = false;
+    const cityInLocalStorage = this.myCitiesArray.filter(e => e.Key === city.Key);
 
-    if (this.myCitiesArray.length === null) {
-      for (const c of this.myCitiesArray) {
-        if (c.Key === city.Key) {
-          isFind = true;
-        }
-      }
+    if (cityInLocalStorage.length !== 0) {
+      isFind = true;
     }
 
-    if (!isFind) {
-      this.citiesArr = new Array<CityModel>();
-
-      if (this.myCitiesArray.length !== undefined) {
-        this.citiesArr = this.myCitiesArray;
-      } else {
-        // @ts-ignore
-        this.citiesArr.push(this.myCitiesArray);
-      }
-
-      await this.loadLocationKey(city.Key);
-
-      this.citiesArr.push(this.selectedCity);
-      this.myCitiesArray = this.citiesArr;
-
-      localStorage.setItem('cities', JSON.stringify(this.citiesArr));
-    }
+    if (!isFind) { this.addLocationByKeyToStorage(city.Key); }
   }
 
   private deleteCity(city: CityModel) {
-    this.myCitiesArray.forEach(e => {
-      if (e.Key === city.Key) {
-        this.myCitiesArray.splice(this.myCitiesArray.indexOf(e), 1);
-        localStorage.setItem('cities', JSON.stringify(this.myCitiesArray));
-        return;
+    this.myCitiesArray.splice(this.myCitiesArray.indexOf(this.myCitiesArray.filter(e => e.Key === city.Key)[0]), 1);
+    localStorage.setItem('cities', JSON.stringify(this.myCitiesArray));
+  }
+
+  private getLocationByIp() {
+    this.observableLocationByIp = this.httpService.getLocationByIp();
+    this.locationByIpSubscriptions = this.observableLocationByIp.subscribe({
+      next: (data: CityModel) => {
+        this.city = new CityModel(data.Key, data.LocalizedName, data.Country);
+      },
+      complete: () => {
+
+        this.myCitiesArray.push(this.city);
+        this.isLoad = true;
+      },
+      error: error => {
+        this.isLoad = false;
+        this.isErrorVisible = true;
+        console.error('There was an error!', error);
       }
     });
   }
 
   ngOnDestroy() {
     this.searchLocationAutoSubscription.unsubscribe();
+    this.locationByIpSubscriptions.unsubscribe();
+    this.locationKeySubscriptions.unsubscribe();
   }
 }
